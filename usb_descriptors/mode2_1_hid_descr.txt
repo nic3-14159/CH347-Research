@@ -1,0 +1,18 @@
+Usage Page (FFA0h),         ; FFA0h, vendor-defined
+Usage (01h),
+Collection (Application),
+    Usage (01h),
+    Logical Minimum (0),
+    Logical Maximum (255),
+    Report Size (8),
+    Report Count (512),
+    Input (Variable),
+    Usage (02h),
+    Report Size (8),
+    Report Count (512),
+    Output (Variable),
+    Usage (03h),
+    Report Size (8),
+    Report Count (64),
+    Feature (Variable),
+End Collection
