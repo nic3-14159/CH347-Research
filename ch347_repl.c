@@ -51,8 +51,10 @@ int main(int argc, char** argv) {
 	char input_buffer[LINE_LENGTH];
 	char *args[32] = {NULL};
 	char *data_buf = NULL;
+	int data_size = 0;
 	unsigned long cs = 0;
-	unsigned long o;
+	unsigned long length1 = 0;
+	unsigned long length2 = 0;
 	while (1) {
 		printf("CH347: ");
 		fflush(stdout);
@@ -87,13 +89,40 @@ int main(int argc, char** argv) {
 			mask = ((mask & 0x10) << 4) | (mask & 1);
 			cs = ((cs & 0x10) << 4) | (cs & 1);
 			CH347SPI_SetChipSelect(0, mask, cs, 0, 0, 0);
-			
 		} else if (strcmp(input_buffer, "r") == 0) {
-			continue;
+			unsigned long cs = strtol(args[1], NULL, 16);
+			unsigned long length1 = strtol(args[2], NULL, 16);
+			unsigned long length2 = strtol(args[3], NULL, 16);
+			CH347SPI_Read(0, cs, length1, &length2, data_buf);
+			for (int j = 0; j < length2; j++) {
+				printf("%02X ", data_buf[j]);
+			}
+			printf("\n");
 		} else if (strcmp(input_buffer, "w") == 0) {
-			continue;
+			unsigned long cs = strtol(args[1], NULL, 16);
+			unsigned long length1 = strtol(args[2], NULL, 16);
+			unsigned long length2 = strtol(args[3], NULL, 16);
+			CH347SPI_Write(0, cs, length1, length2, data_buf);
+			for (int j = 0; j < length2; j++) {
+				printf("%02hhX ", data_buf[j]);
+			}
+			printf("\n");
 		} else if (strcmp(input_buffer, "wr") == 0) {
-			continue;
+			unsigned long cs = strtol(args[1], NULL, 16);
+			unsigned long length1 = strtol(args[2], NULL, 16);
+			CH347SPI_WriteRead(0, cs, length1, data_buf);
+			for (int j = 0; j < length1; j++) {
+				printf("%02hhX ", data_buf[j]);
+			}
+			printf("\n");
+		} else if (strcmp(input_buffer, "streamSPI4") == 0) {
+			unsigned long cs = strtol(args[1], NULL, 16);
+			unsigned long length1 = strtol(args[2], NULL, 16);
+			CH347StreamSPI4(0, cs, length1, data_buf);
+			for (int j = 0; j < length1; j++) {
+				printf("%02hhX ", data_buf[j]);
+			}
+			printf("\n");
 		} else if (strcmp(input_buffer, "spicfg") == 0) {
 			unsigned long val = strtol(args[2], NULL, 16);
 			set_spiCfg(&spiCfg, args[1], val);
@@ -101,9 +130,17 @@ int main(int argc, char** argv) {
 		} else if (strcmp(input_buffer, "init") == 0) {
 			ret = CH347SPI_Init(0, &spiCfg);
 			printf(!ret ? " Error! CH347SPI_Init\n" : "");
+		} else if (strcmp(input_buffer, "buffer") == 0) {
+			data_size = strtol(args[1], NULL, 10);
+			data_buf = realloc(data_buf, data_size);
+			memset(data_buf, 0, data_size);
+			for (int j = 0; j < data_size; j++) {
+				data_buf[j] = strtol(args[j+2], NULL, 16);
+			}
 		} else {
 			printf("Unknown command: %s\n", input_buffer);
 		}
 	}
+	free(data_buf);
 	return 0;
 }
