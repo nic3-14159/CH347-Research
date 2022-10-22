@@ -34,6 +34,20 @@ static void set_spiCfg(mSpiCfgS *cfg, char *field, unsigned long value) {
 		printf("Bad value\n");
 	}
 }
+
+static void print_buffer(unsigned char *buffer, int len) {
+	for (int j = 0; j < len; j++) {
+		if (j % 16 == 0) {
+			printf("%06X: ", j);
+		}
+		printf("%02hhX ", buffer[j]);
+		if (j % 16 == 15) {
+			printf("\n");
+		}
+	}
+	printf("\n");
+
+}
 int main(int argc, char** argv) {
 	ULONG i = 0;
 	BOOL ret = FALSE;
@@ -50,8 +64,8 @@ int main(int argc, char** argv) {
 
 	char input_buffer[LINE_LENGTH];
 	char *args[32] = {NULL};
-	char *data_buf = NULL;
-	char *data_out = NULL;
+	unsigned char *data_buf = NULL;
+	unsigned char *data_out = NULL;
 	int data_size = 0;
 	unsigned long cs = 0;
 	unsigned long length1 = 0;
@@ -96,38 +110,26 @@ int main(int argc, char** argv) {
 			unsigned long length2 = strtol(args[3], NULL, 16);
 			memcpy(data_buf, data_out, data_size);
 			CH347SPI_Read(0, cs, length1, &length2, data_buf);
-			for (int j = 0; j < length2; j++) {
-				printf("%02X ", data_buf[j]);
-			}
-			printf("\n");
+			print_buffer(data_buf, length2);
 		} else if (strcmp(input_buffer, "w") == 0) {
 			unsigned long cs = strtol(args[1], NULL, 16);
 			unsigned long length1 = strtol(args[2], NULL, 16);
 			unsigned long length2 = strtol(args[3], NULL, 16);
 			memcpy(data_buf, data_out, data_size);
 			CH347SPI_Write(0, cs, length1, length2, data_buf);
-			for (int j = 0; j < length2; j++) {
-				printf("%02hhX ", data_buf[j]);
-			}
-			printf("\n");
+			print_buffer(data_buf, length2);
 		} else if (strcmp(input_buffer, "wr") == 0) {
 			unsigned long cs = strtol(args[1], NULL, 16);
 			unsigned long length1 = strtol(args[2], NULL, 16);
 			memcpy(data_buf, data_out, data_size);
 			CH347SPI_WriteRead(0, cs, length1, data_buf);
-			for (int j = 0; j < length1; j++) {
-				printf("%02hhX ", data_buf[j]);
-			}
-			printf("\n");
+			print_buffer(data_buf, length1);
 		} else if (strcmp(input_buffer, "streamSPI4") == 0) {
 			unsigned long cs = strtol(args[1], NULL, 16);
 			unsigned long length1 = strtol(args[2], NULL, 16);
 			memcpy(data_buf, data_out, data_size);
 			CH347StreamSPI4(0, cs, length1, data_buf);
-			for (int j = 0; j < length1; j++) {
-				printf("%02hhX ", data_buf[j]);
-			}
-			printf("\n");
+			print_buffer(data_buf, length1);
 		} else if (strcmp(input_buffer, "spicfg") == 0) {
 			unsigned long val = strtol(args[2], NULL, 16);
 			set_spiCfg(&spiCfg, args[1], val);
