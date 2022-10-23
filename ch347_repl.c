@@ -134,6 +134,19 @@ int main(int argc, char** argv) {
 			unsigned long val = strtol(args[2], NULL, 16);
 			set_spiCfg(&spiCfg, args[1], val);
 			continue;
+		} else if (strcmp(input_buffer, "get_spicfg") == 0) {
+			mSpiCfgS curr_spiCfg;
+			CH347SPI_GetCfg(0, &curr_spiCfg);
+			printf("iMode: %d\n", curr_spiCfg.iMode);
+			printf("iClock: %d\n", curr_spiCfg.iClock);
+			printf("iByteOrder: %d\n", curr_spiCfg.iByteOrder);
+			printf("iSpiWriteReadInterval: %d\n", curr_spiCfg.iSpiWriteReadInterval);
+			printf("iChipSelect: 0x%02x\n", curr_spiCfg.iChipSelect);
+			printf("CS1Polarity: %d\n", curr_spiCfg.CS1Polarity);
+			printf("CS2Polarity: %d\n", curr_spiCfg.CS2Polarity);
+			printf("iIsAutoDeativeCS: %d\n", curr_spiCfg.iIsAutoDeativeCS);
+			printf("iActiveDelay: %d\n", curr_spiCfg.iActiveDelay);
+			printf("iDelayDeactive: %d\n", curr_spiCfg.iDelayDeactive);
 		} else if (strcmp(input_buffer, "init") == 0) {
 			ret = CH347SPI_Init(0, &spiCfg);
 			printf(!ret ? " Error! CH347SPI_Init\n" : "");
