@@ -1,0 +1,193 @@
+CH347SPI_SetChipSelect
+CS0, CS1 polarity are both active low
+00 00 no traffic
+00 01 no traffic
+00 10 no traffic
+00 11 no traffic
+
+01 00 c10a00 8 000000000 0 000000000 CS0 goes low
+01 01 c10a00 c 000000000 0 000000000 CS0 goes high
+01 10 c10a00 8 000000000 4 000000000 CS0 goes low
+01 11 c10a00 c 000000000 4 000000000 CS0 goes high
+
+10 00 c10a00 0 000000000 8 000000000 CS1 goes low
+10 01 c10a00 4 000000000 8 000000000 CS1 stays low
+10 10 c10a00 0 000000000 c 000000000 CS1 goes high
+10 11 c10a00 4 000000000 c 000000000 CS1 stays high
+
+11 00 c10a00 8 000000000 8 000000000 Both go low 
+11 01 c10a00 c 000000000 8 000000000 CS0 goes high
+11 10 c10a00 8 000000000 c 000000000 CS1 goes high, CS0 goes low
+11 11 c10a00 c 000000000 c 000000000 Both go high
+
+CS0 active high, CS1 active low
+01 00 c10a00 8 000000000 0 000000000
+01 01 c10a00 c 000000000 0 000000000
+01 10 c10a00 8 000000000 4 000000000
+01 11 c10a00 c 000000000 4 000000000
+
+10 00 c10a00 0 000000000 8 000000000
+10 01 c10a00 4 000000000 8 000000000
+10 10 c10a00 0 000000000 c 000000000
+10 11 c10a00 4 000000000 c 000000000
+
+11 00 c10a00 8 000000000 8 000000000
+11 01 c10a00 c 000000000 8 000000000
+11 10 c10a00 8 000000000 c 000000000
+11 11 c10a00 c 000000000 c 000000000
+
+-> These are the same as the previous commands, so the polarity settings don't change the command.
+However, it seems like the CS1 polarity setting is being ignored. and the CS0 polarity is used for
+both.
+
+CH347SPI_ChangeCS
+CS0, CS1 polarity are both active low
+    0 c10a00 8 000000000 0 000000000 CS0 goes low
+    1 c10a00 c 000000000 0 000000000 CS0 goes high
+========================================================================================
+In these experiments, the buffer is 4 bytes containing 9F FF FF FF (RDID command)
+
+CH347SPI_Read
+* Maximum number of bytes sent in a single transfer is 510.
+
+CH347SPI_Read(iIndex=0, iCS=0, oLength=1, *iLength=4, buffer), return C2 20 15 C2
+c1 0a00 80000000000000000000 URB_BULK out
+c2 0100 9f              URB_BULK out
+c2 0100 00              URB_BULK in
+c3 0400 04000000        URB_BULK out
+c3 0400 c22015c2        URB_BULK in
+c1 0a00 c0000000000000000000 URB_BULK out
+
+CH347SPI_Read(iIndex=0, iCS=0, oLength=1, *iLength=3, buffer), return C2 20 15
+c1 0a00 80000000000000000000 URB_BULK out
+c2 0100 9f              URB_BULK out
+c2 0100 00              URB_BULK in
+c3 0400 03000000        URB_BULK out
+c3 0300 c22015          URB_BULK in
+c1 0a00 c0000000000000000000 URB_BULK out
+
+CH347SPI_Read(iIndex=0, iCS=0, oLength=1, *iLength=2, buffer), return C2 20
+c1 0a00 80000000000000000000 URB_BULK out
+c2 0100 9f              URB_BULK out
+c2 0100 00              URB_BULK in
+c3 0400 02000000        URB_BULK out
+c3 0200 c220            URB_BULK in
+c1 0a00 c0000000000000000000 URB_BULK out
+
+CH347SPI_Read(iIndex=0, iCS=0, oLength=2, *iLength=4, buffer), return 20 14 C2 20
+c1 0a00 80000000000000000000 URB_BULK out
+c2 0200 9fff            URB_BULK out
+c2 0200 00c2            URB_BULK in
+c3 0400 04000000        URB_BULK out
+c3 0400 2014c220        URB_BULK in
+c1 0a00 c0000000000000000000 URB_BULK out
+
+CH347SPI_Read(iIndex=0, iCS=0, oLength=2, *iLength=3, buffer), return 20 14 C2
+c1 0a00 80000000000000000000 URB_BULK out
+c2 0200 9fff            URB_BULK out
+c2 0200 00c2            URB_BULK in
+c3 0400 03000000        URB_BULK out
+c3 0300 2014c2          URB_BULK in
+c1 0a00 c0000000000000000000 URB_BULK out
+
+CH347SPI_Read(iIndex=0, iCS=0, oLength=2, *iLength=2, buffer), return 20 14
+c1 0a00 80000000000000000000 URB_BULK out
+c2 0200 9fff            URB_BULK out
+c2 0200 00c2            URB_BULK in
+c3 0400 02000000        URB_BULK out
+c3 0200 2014            URB_BULK in
+c1 0a00 c0000000000000000000 URB_BULK out
+------------------------------------------------------------------------------
+CH347SPI_WriteRead(iIndex=0, iCS=0, iLength=4, buffer), return 00 C2 20 15
+c1 0a00 80000000000000000000 URB_BULK out
+c2 0400 9fffffff        URB_BULK out
+c2 0400 00c22015        URB_BULK in
+c1 0a00 c0000000000000000000 URB_BULK out
+
+CH347SPI_WriteRead(iIndex=0, iCS=0, iLength=3, buffer), return  00 C2 20
+c1 0a00 80000000000000000000 URB_BULK out
+c2 0300 9fffff          URB_BULK out
+c2 0300 00c220          URB_BULK in
+c1 0a00 c0000000000000000000 URB_BULK out
+
+CH347SPI_WriteRead(iIndex=0, iCS=0, iLength=2, buffer), return 00 C2
+c1 0a00 80000000000000000000 URB_BULK out
+c2 0200 9fff            URB_BULK out
+c2 0200 00c2            URB_BULK in
+c1 0a00 c0000000000000000000 URB_BULK out
+
+-----------------------------------------------------------------------------------
+* iLength is the total number of bytes to send.
+* iWriteStep is the number of bytes to send in a single burst
+* This function waits for spiCfg.iSpiWriteRealInterval between bursts
+CH347SPI_Write(iIndex=0, iCS=0, iLength=4, iWriteStep=4, buffer), return 9F FF FF FF
+c1 0a00 80000000000000000000 URB_BULK out
+c4 0400 9fffffff        URB_BULK out
+c4 0100 00              URB_BULK in
+c1 0a00 c0000000000000000000 URB_BULK out
+
+CH347SPI_Write(iIndex=0, iCS=0, iLength=3, iWriteStep=4, buffer), return 9F FF FF FF
+c1 0a00 80000000000000000000 URB_BULK out
+c4 0300 9fffff          URB_BULK out
+c4 0100 00              URB_BULK in
+c1 0a00 c0000000000000000000 URB_BULK out
+
+CH347SPI_Write(iIndex=0, iCS=0, iLength=2, iWriteStep=4, buffer), return 9F FF FF FF
+c1 0a00 80000000000000000000 URB_BULK out
+c4 0200 9fff            URB_BULK out
+c4 0100 00              URB_BULK in
+c1 0a00 c0000000000000000000 URB_BULK out
+
+CH347SPI_Write(iIndex=0, iCS=0, iLength=1, iWriteStep=4, buffer), return 9F FF FF FF
+c1 0a00 80000000000000000000 URB_BULK out
+c4 0100 9f              URB_BULK out
+c4 0100 00              URB_BULK in
+c1 0a00 c0000000000000000000 URB_BULK out
+
+CH347SPI_Write(iIndex=0, iCS=0, iLength=4, iWriteStep=3, buffer), return 9F FF FF
+c1 0a00 80000000000000000000 URB_BULK out
+c4 0300 9fffff          URB_BULK out
+c4 0100 00              URB_BULK in
+c4 0100 ff              URB_BULK out
+c4 0100 00              URB_BULK in
+c1 0a00 c0000000000000000000 URB_BULK out
+
+CH347SPI_Write(iIndex=0, iCS=0, iLength=4, iWriteStep=2, buffer), return 9F FF
+c1 0a00 80000000000000000000 URB_BULK out
+c4 0200 9fff            URB_BULK out
+c4 0100 00              URB_BULK in
+c4 0200 ffff            URB_BULK out
+c4 0100 00              URB_BULK in
+c1 0a00 c0000000000000000000 URB_BULK out
+
+CH347SPI_Write(iIndex=0, iCS=0, iLength=2, iWriteStep=2, buffer), return 9F FF
+c1 0a00 80000000000000000000 URB_BULK out
+c4 0200 9fff            URB_BULK out
+c4 0100 00              URB_BULK in
+c1 0a00 c0000000000000000000 URB_BULK out
+
+CH347SPI_Write(iIndex=0, iCS=0, iLength=1, iWriteStep=1, buffer), return 9F
+c1 0a00 80000000000000000000 URB_BULK out
+c4 0100 9f              URB_BULK out
+c4 0100 00              URB_BULK in
+c1 0a00 c0000000000000000000 URB_BULK out
+
+CH347SPI_Write(iIndex=0, iCS=0, iLength=0, iWriteStep=1, buffer), return 9F
+c1 0a00 80000000000000000000 URB_BULK out
+c1 0a00 c0000000000000000000 URB_BULK out
+
+CH347SPI_Write(iIndex=0, iCS=0, iLength=1, iWriteStep=0, buffer), timeouts
+c1 0a00 80000000000000000000 URB_BULK out
+c4 0000                 URB_BULK out
+c4 0000                 URB_BULK out
+c4 0000                 URB_BULK out
+c4 0000                 URB_BULK out
+c4 0000                 URB_BULK out
+c4 0000                 URB_BULK out
+c4 0000                 URB_BULK out
+c4 0000                 URB_BULK out
+c1 0a00 c0000000000000000000 URB_BULK out
+=======================================================================
+CH347SPI_GetCfg()
+ca 0100 01 URB_BULK out
+ca 1a00 0000040100000000000000020000800007000000000000000000 URB_BULK in
