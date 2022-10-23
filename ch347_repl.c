@@ -106,27 +106,27 @@ int main(int argc, char** argv) {
 			CH347SPI_SetChipSelect(0, mask, cs, 0, 0, 0);
 		} else if (strcmp(input_buffer, "r") == 0) {
 			unsigned long cs = strtol(args[1], NULL, 16);
-			unsigned long length1 = strtol(args[2], NULL, 16);
-			unsigned long length2 = strtol(args[3], NULL, 16);
+			sscanf(args[2], "%li", &length1);
+			sscanf(args[3], "%li", &length2);
 			memcpy(data_buf, data_out, data_size);
 			CH347SPI_Read(0, cs, length1, &length2, data_buf);
 			print_buffer(data_buf, length2);
 		} else if (strcmp(input_buffer, "w") == 0) {
 			unsigned long cs = strtol(args[1], NULL, 16);
-			unsigned long length1 = strtol(args[2], NULL, 16);
-			unsigned long length2 = strtol(args[3], NULL, 16);
+			sscanf(args[2], "%li", &length1);
+			sscanf(args[3], "%li", &length2);
 			memcpy(data_buf, data_out, data_size);
 			CH347SPI_Write(0, cs, length1, length2, data_buf);
 			print_buffer(data_buf, length2);
 		} else if (strcmp(input_buffer, "wr") == 0) {
 			unsigned long cs = strtol(args[1], NULL, 16);
-			unsigned long length1 = strtol(args[2], NULL, 16);
+			sscanf(args[2], "%li", &length1);
 			memcpy(data_buf, data_out, data_size);
 			CH347SPI_WriteRead(0, cs, length1, data_buf);
 			print_buffer(data_buf, length1);
 		} else if (strcmp(input_buffer, "streamSPI4") == 0) {
 			unsigned long cs = strtol(args[1], NULL, 16);
-			unsigned long length1 = strtol(args[2], NULL, 16);
+			sscanf(args[2], "%li", &length1);
 			memcpy(data_buf, data_out, data_size);
 			CH347StreamSPI4(0, cs, length1, data_buf);
 			print_buffer(data_buf, length1);
