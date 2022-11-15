@@ -6,8 +6,8 @@
 
 ## Commands
 - 0xC0: SPI Interface configuration
-        - Must be preceded by a Read SPI Config command
-        - Must be followed by a USB BULK IN request to receive the status
+	- Must be preceded by a Read SPI Config command
+	- Must be followed by a USB BULK IN request to receive the status
 ```
 c0 1a00 000004010000 00 00 00 000002 00 00 80 000700 0000 00 00 00000000
                       |     |        |     |         |    |  |--CS Polarity: bit 7 CS2
